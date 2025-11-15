@@ -1,30 +1,38 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+﻿# STAGE 1: "BUILD"
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
 
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
+# 1. Copying project files for dependecy caching
+COPY ["src/ArchitectApp/ArchitectApp.csproj", "src/ArchitectApp/"]
+COPY ["src/ArchitectApp/ClientApp/package.json", "src/ArchitectApp/ClientApp/"]
+COPY ["src/ArchitectApp/ClientApp/package-lock.json", "src/ArchitectApp/ClientApp/"]
+
+# 2. Restoring .NET dependecies (NuGet packages)
+RUN dotnet restore "src/ArchitectApp/ArchitectApp.csproj"
+
+# 3. Restoring Node.js dependecies (node_modules)
+RUN npm install --prefix "src/ArchitectApp/ClientApp"
+
+# 4. Copying the source code
+COPY . .
+
+# 5. Frontend Build (Vite)
+# wwwroot/dist folder will be generated here
+RUN npm run build --prefix "src/ArchitectApp/ClientApp"
+
+# 6. Publishing .NET App
+# compiles source code , collects wwwroot directory
+RUN dotnet publish "src/ArchitectApp/ArchitectApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+
+# STAGE 2: "FINAL"
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
+# 7. Copying the finished app from "build" stage
+COPY --from=build /app/publish .
 
-# This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["ArchitectApp/ArchitectApp.csproj", "ArchitectApp/"]
-RUN dotnet restore "./ArchitectApp/ArchitectApp.csproj"
-COPY . .
-WORKDIR "/src/ArchitectApp"
-RUN dotnet build "./ArchitectApp.csproj" -c $BUILD_CONFIGURATION -o /app/build
-
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./ArchitectApp.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
+# 8. Execution command
 ENTRYPOINT ["dotnet", "ArchitectApp.dll"]
