@@ -482,3 +482,19 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+## Frontend (Vite / Node.js) ##
+
+# Vite build output
+/src/ArchitectApp/wwwroot/dist/
+
+# Vite development cache
+.vite/
+
+# Local environment files
+.env.local
+.env.*.local
+
+# NPM and Yarn error logs
+npm-debug.log*
+yarn-error.log
