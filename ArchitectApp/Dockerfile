@@ -1,5 +1,11 @@
 ﻿# STAGE 1: "BUILD"
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+
 WORKDIR /src
 
 # 1. Copying project files for dependecy caching
