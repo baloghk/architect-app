@@ -56,6 +56,24 @@ namespace ArchitectApp
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<ArchitectDbContext>();
+
+                    context.Database.Migrate();
+
+                    Console.WriteLine("Migration completed successfully!");
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occured during migration!");
+                }
+            }
+
             app.Run();
         }
     }
