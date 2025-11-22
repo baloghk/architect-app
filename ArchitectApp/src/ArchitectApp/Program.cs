@@ -1,10 +1,36 @@
+using ArchitectApp.Data;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using DotNetEnv;
+
 namespace ArchitectApp
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+            Env.Load();
+
             var builder = WebApplication.CreateBuilder(args);
+
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            var dbPassword = Environment.GetEnvironmentVariable("DB_PASSWORD");
+
+            if (!string.IsNullOrEmpty(dbPassword))
+            {
+                var csBuilder = new SqlConnectionStringBuilder(connectionString);
+                csBuilder.Password = dbPassword;
+                csBuilder.UserID = Environment.GetEnvironmentVariable("DB_USER") ?? "sa";
+
+                connectionString = csBuilder.ConnectionString;
+            }
+
+            builder.Services.AddDbContext<ArchitectDbContext>(options =>
+                options.UseSqlServer(connectionString));
+
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddEntityFrameworkStores<ArchitectDbContext>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
