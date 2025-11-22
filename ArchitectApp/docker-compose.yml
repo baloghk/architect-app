@@ -13,6 +13,7 @@ services:
       - db
 
   db:
+    user: root
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: architect_db
     restart: always
