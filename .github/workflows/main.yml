@@ -8,10 +8,9 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  CONTAINER_NAME: architectapp
 
 jobs:
-  # 1st job: BUILD (runs on GitHub cloud)
+  # 1st JOB: BUILD
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
@@ -46,12 +45,15 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  # 2nd job: DEPLOY (runs on homeserver)
+  # 2nd JOB: DEPLOY
   deploy-to-home-server:
     needs: build-and-push
     runs-on: [self-hosted, linux]
     
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -59,24 +61,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull the latest Docker image
+      - name: Deploy with Docker Compose
+        env:
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-          docker pull $IMAGE_ID:latest
+          cd ArchitectApp
 
-      - name: Stop and remove existing container
-        run: |
-          docker stop ${{ env.CONTAINER_NAME }} || true
-          docker rm ${{ env.CONTAINER_NAME }} || true
-
-      - name: Run new container
-        run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          docker compose pull
           
-          docker run -d \
-            --name ${{ env.CONTAINER_NAME }} \
-            --restart always \
-            -p 80:8080 \
-            $IMAGE_ID:latest
+          docker compose up -d --remove-orphans
