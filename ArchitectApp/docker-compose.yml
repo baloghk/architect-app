@@ -1,0 +1,28 @@
+services:
+  architectapp:
+    image: ghcr.io/${GITHUB_REPOSITORY}:latest #
+    container_name: architect_web
+    restart: always
+    ports:
+      - "80:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=db;Database=ArchitectAppDb;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True;
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: architect_db
+    restart: always
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./sql_data:/var/opt/mssql/data
+
+volumes:
+  sql_data:
