@@ -29,6 +29,11 @@ namespace ArchitectApp
             builder.Services.AddDbContext<ArchitectDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
+            builder.Services.AddHttpClient("EmailService", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(10);
+            });
+
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ArchitectDbContext>();
 

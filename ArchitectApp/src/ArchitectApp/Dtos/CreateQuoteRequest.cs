@@ -1,13 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ArchitectApp.Models
+namespace ArchitectApp.Dto
 {
-    public class QuoteRequest
+    public class CreateQuoteRequest
     {
-        public int Id { get; set; }
-
-        public Guid PublicId { get; set; } = Guid.NewGuid();
-
         [Required, StringLength(100)]
         public string Name { get; set; }
 
@@ -24,7 +20,7 @@ namespace ArchitectApp.Models
         public string Location { get; set; }
 
         [Required]
-        public string HousePlanPath { get; set; }
+        public IFormFile HousePlan { get; set; }
 
         [Required]
         public DateTime StartOfProject { get; set; }
@@ -34,8 +30,5 @@ namespace ArchitectApp.Models
 
         [Required, StringLength(2000)]
         public string Description { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
-
 }

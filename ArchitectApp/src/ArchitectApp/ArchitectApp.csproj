@@ -25,6 +25,8 @@
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Services\" />
+    <Folder Include="wwwroot\uploads\" />
+    <Folder Include="wwwroot\uploads\houseplans\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,10 +34,6 @@
 	<None Remove="ClientApp\**" />
 
 	<None Include="ClientApp\dist\**" CopyToPublishDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-	<Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>
