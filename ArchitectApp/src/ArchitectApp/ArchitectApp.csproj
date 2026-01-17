@@ -19,11 +19,14 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.4" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Data\" />
     <Folder Include="Services\" />
+    <Folder Include="wwwroot\uploads\" />
+    <Folder Include="wwwroot\uploads\houseplans\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,10 +34,6 @@
 	<None Remove="ClientApp\**" />
 
 	<None Include="ClientApp\dist\**" CopyToPublishDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-	<Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>

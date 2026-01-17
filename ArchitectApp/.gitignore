@@ -498,3 +498,8 @@ $RECYCLE.BIN/
 # NPM and Yarn error logs
 npm-debug.log*
 yarn-error.log
+yarn-debug.log*
+
+# Ignore uploaded files
+/src/ArchitectApp/wwwroot/uploads/houseplans/*
+!.gitkeep

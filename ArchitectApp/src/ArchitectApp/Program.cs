@@ -29,11 +29,20 @@ namespace ArchitectApp
             builder.Services.AddDbContext<ArchitectDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
+            builder.Services.AddHttpClient("EmailService", client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(10);
+            });
+
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ArchitectDbContext>();
 
-            // Add services to the container.
+            // Add MVC
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
 
             var app = builder.Build();
 
@@ -41,7 +50,6 @@ namespace ArchitectApp
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -51,6 +59,9 @@ namespace ArchitectApp
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
 
             app.MapControllerRoute(
                 name: "default",
