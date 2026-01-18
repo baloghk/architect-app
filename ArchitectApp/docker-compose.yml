@@ -24,7 +24,6 @@ services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: architect_db
-    user: "10001:0"
     restart: always
     environment:
       ACCEPT_EULA: Y
